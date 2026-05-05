@@ -1,3 +1,23 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 05.05.2026 00:20:26
+// Design Name: 
+// Module Name: alu
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
 module Eight_bit_ALU_rtl_design
 #(parameter N=4, parameter M=8)
 (OPA,OPB,CIN,CLK,RST,CMD,inp_valid,CE,MODE,COUT,OFLOW,RES,G,E,L,ERR);
@@ -40,6 +60,7 @@ begin
         G <= 0; E <= 0; L <= 0;
         ERR <= 0;
     end
+
     else if (CE) begin
         RES   <= 0;
         COUT  <= 0;
@@ -50,23 +71,18 @@ begin
         if (MODE) begin
             case (CMD)
 
-            4'b0000: if(inp_valid==2'b11) begin
-                res_n = OPA_1 + OPB_1;
-                RES   <= res_n;
-                COUT  <= res_n[N];
-            end
+            4'b0000: if(inp_valid==2'b11)
+                {COUT, RES[N-1:0]} <= OPA_1 + OPB_1;
 
             4'b0001: if(inp_valid==2'b11) begin
                 res_n = OPA_1 - OPB_1;
                 RES   <= res_n;
-                OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) && (res_n[N-1] != OPA_1[N-1]);
+                OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) &&
+                         (res_n[N-1] != OPA_1[N-1]);
             end
 
-            4'b0010: if(inp_valid==2'b11) begin
-                res_n = OPA_1 + OPB_1 + CIN;
-                RES   <= res_n;
-                COUT  <= res_n[N];
-            end
+            4'b0010: if(inp_valid==2'b11)
+                {COUT, RES[N-1:0]} <= OPA_1 + OPB_1 + CIN;
 
             4'b0011: if(inp_valid==2'b11) begin
                 res_n = OPA_1 - OPB_1 - CIN;
@@ -88,33 +104,25 @@ begin
 
             4'b1001: if(inp_valid==2'b11) begin
                 case(cnt9)
-                    2'd0: begin 
-	temp9 <= (OPA_1+1)*(OPB_1+1); 
-	cnt9 <= 1; end
+                    2'd0: begin temp9 <= (OPA_1+1)*(OPB_1+1); cnt9 <= 1; end
                     2'd1: cnt9 <= 2;
-                    2'd2: begin 
-	RES <= temp9; 
-	cnt9 <= 0; 
-	end
+                    2'd2: begin RES <= temp9; cnt9 <= 0; end
                 endcase
             end
 
             4'b1010: if(inp_valid==2'b11) begin
                 case(cnt10)
-                    2'd0: begin 
-		temp10 <= (OPA_1<<1)*OPB_1;
-			 cnt10 <= 1; 
-			end
+                    2'd0: begin temp10 <= (OPA_1<<1)*OPB_1; cnt10 <= 1; end
                     2'd1: cnt10 <= 2;
-                    2'd2: begin 
-		RES <= temp10; cnt10 <= 0; end
+                    2'd2: begin RES <= temp10; cnt10 <= 0; end
                 endcase
             end
 
             4'b1011: if(inp_valid==2'b11) begin
                 res_n = $signed(OPA_1) + $signed(OPB_1);
                 RES   <= res_n;
-                OFLOW <= (OPA_1[N-1] == OPB_1[N-1]) && (res_n[N-1] != OPA_1[N-1]);
+                OFLOW <= (OPA_1[N-1] == OPB_1[N-1]) &&
+                         (res_n[N-1] != OPA_1[N-1]);
                 G <= ($signed(OPA_1) > $signed(OPB_1));
                 L <= ($signed(OPA_1) < $signed(OPB_1));
                 E <= ($signed(OPA_1) == $signed(OPB_1));
@@ -123,7 +131,8 @@ begin
             4'b1100: if(inp_valid==2'b11) begin
                 res_n = $signed(OPA_1) - $signed(OPB_1);
                 RES   <= res_n;
-                OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) && (res_n[N-1] != OPA_1[N-1]);
+                OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) &&
+                         (res_n[N-1] != OPA_1[N-1]);
                 G <= ($signed(OPA_1) > $signed(OPB_1));
                 L <= ($signed(OPA_1) < $signed(OPB_1));
                 E <= ($signed(OPA_1) == $signed(OPB_1));
@@ -159,7 +168,7 @@ begin
 
                 4'b1101: if(inp_valid==2'b11) begin
                     ERR <= 0;
-                    if (OPB_1[N-1:4] != 0) begin
+                    if (OPB_1[N-1:3] != 0) begin
                         ERR <= 1;
                         RES <= {1'b1, OPA_1};
                     end
@@ -167,7 +176,7 @@ begin
                         if (OPB_1[2:0] == 0)
                             RES <= {1'b0, OPA_1};
                         else
-                           RES <= {1'b0, ({OPA_1,OPA_1} >> OPB_1[2:0])};
+                            RES <= {1'b0, (({OPA_1,OPA_1} >> OPB_1[2:0]) >> N)};
                     end
                 end
 
@@ -177,3 +186,4 @@ begin
 end
 
 endmodule
+
