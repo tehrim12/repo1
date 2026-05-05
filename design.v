@@ -167,7 +167,7 @@ begin
                         if (OPB_1[2:0] == 0)
                             RES <= {1'b0, OPA_1};
                         else
-                            RES <= {1'b0, (({OPA_1,OPA_1} >> OPB_1[2:0]))[N-1:0]};
+                           RES <= {1'b0, ({OPA_1,OPA_1} >> OPB_1[2:0])};
                     end
                 end
 
