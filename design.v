@@ -57,7 +57,8 @@ begin
     end
 
     else if (CE) begin
-        RES<=0; COUT<=0; OFLOW<=0;
+       // RES<=0; 
+       COUT<=0; OFLOW<=0;
         G<=0; E<=0; L<=0; ERR<=0;
 
         if (MODE) begin
@@ -65,12 +66,15 @@ begin
 
             4'b0000:
                 if(inp_valid==2'b11)
-                    {COUT, RES[N-1:0]} <= OPA_1 + OPB_1;
+                begin
+                    RES <= OPA_1 + OPB_1;
+                     COUT<=RES[N]?1:0;
+                     end      
                 else ERR <= 1;
 
             4'b0001:
                 if(inp_valid==2'b11) begin
-                    res_n = OPA_1 - OPB_1;
+                    res_n <= OPA_1 - OPB_1;
                     RES   <= res_n;
                     OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) &&
                              (res_n[N-1] != OPA_1[N-1]);
@@ -79,12 +83,18 @@ begin
 
             4'b0010:
                 if(inp_valid==2'b11)
-                    {COUT, RES[N-1:0]} <= OPA_1 + OPB_1 + CIN;
-                else ERR <= 1;
+                begin
+                   RES <= OPA_1 + OPB_1 + CIN;
+                   COUT<=RES[N]?1:0;
+                   end
+                else begin
+                RES<= 0;
+                ERR <= 1;
+                end
 
             4'b0011:
                 if(inp_valid==2'b11) begin
-                    res_n = OPA_1 - OPB_1 - CIN;
+                    res_n <= OPA_1 - OPB_1 - CIN;
                     RES   <= res_n;
                     OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) &&
                              (res_n[N-1] != OPA_1[N-1]);
@@ -92,19 +102,31 @@ begin
                 else ERR <= 1;
 
             4'b0100:
-                if(inp_valid==2'b01 || inp_valid==2'b11) RES <= OPA_1 + 1;
+                if(inp_valid==2'b01 || inp_valid==2'b11)
+                begin
+                RES <= OPA_1 + 1;
+                end
                 else ERR <= 1;
 
             4'b0101:
-                if(inp_valid==2'b01 || inp_valid==2'b11) RES <= OPA_1 - 1;
+                if(inp_valid==2'b01 || inp_valid==2'b11) 
+                begin
+                RES <= OPA_1 - 1;
+                end
                 else ERR <= 1;
 
             4'b0110:
-                if(inp_valid==2'b10 || inp_valid==2'b11) RES <= OPB_1 + 1;
+                if(inp_valid==2'b10 || inp_valid==2'b11) 
+                begin
+                RES <= OPB_1 + 1;
+                end
                 else ERR <= 1;
 
             4'b0111:
-                if(inp_valid==2'b10 || inp_valid==2'b11) RES <= OPB_1 - 1;
+                if(inp_valid==2'b10 || inp_valid==2'b11) 
+                begin
+                RES <= OPB_1 - 1;
+                end
                 else ERR <= 1;
 
             4'b1000:
@@ -115,38 +137,52 @@ begin
                 end
                 else ERR <= 1;
 
-            4'b1001:
-                if(inp_valid==2'b11) begin
-                    case(cnt9)
-                        2'd0: begin
-                         temp9 <= (OPA_1+1)*(OPB_1+1); 
-                         cnt9 <= 1;
-                          end
-                        2'd1: cnt9 <= 2;
-                        2'd2: begin 
-                        RES = temp9; 
-                       cnt9 <= 0;
-                         end
-                         default:cnt9=0;
-                         
-                    endcase
-                end
-                else ERR <= 1;
+    
+    4'b1001:
+    if(inp_valid==2'b11 ) begin
+        case(cnt9)
 
-            4'b1010:
-                if(inp_valid==2'b11) begin
-                    case(cnt10)
-                        2'd0: begin temp10 <= (OPA_1<<1)*OPB_1; cnt10 <= 1; end
-                        2'd1: cnt10 <= 2;
-                        2'd2: begin RES <= temp10; cnt10 <= 0; end
-                         default:cnt10=0;
-                    endcase
-                end
-                else ERR <= 1;
+            2'd0: begin
+                temp9 <= (OPA_1+1)*(OPB_1+1);
+                RES   <= {M{1'bx}};
+                cnt9  <= 1;
+            end
+
+            2'd1: begin
+                RES   <= temp9;
+                cnt9  <= 0;
+            end
+
+            default: cnt9 <= 0;
+
+        endcase
+    end
+    else ERR <= 1;
+
+          4'b1010:
+    if(inp_valid==2'b11 ) begin
+        case(cnt10)
+
+            2'd0: begin
+                temp10 <= (OPA_1<<1)*OPB_1;
+                RES    <= {M{1'bx}};
+                cnt10  <= 1;
+            end
+
+            2'd1: begin
+                RES    <= temp10;
+                cnt10  <= 0;
+            end
+
+            default: cnt10 <= 0;
+
+        endcase
+    end
+    else ERR <= 1;
 
             4'b1011:
                 if(inp_valid==2'b11) begin
-                    res_n = $signed(OPA_1) + $signed(OPB_1);
+                    res_n <= $signed(OPA_1) + $signed(OPB_1);
                     RES   <= res_n;
                     OFLOW <= (OPA_1[N-1] == OPB_1[N-1]) &&
                              (res_n[N-1] != OPA_1[N-1]);
@@ -155,7 +191,7 @@ begin
 
             4'b1100:
                 if(inp_valid==2'b11) begin
-                    res_n = $signed(OPA_1) - $signed(OPB_1);
+                    res_n <= $signed(OPA_1) - $signed(OPB_1);
                     RES   <= res_n;
                     OFLOW <= (OPA_1[N-1] != OPB_1[N-1]) &&
                              (res_n[N-1] != OPA_1[N-1]);
@@ -256,3 +292,5 @@ end
         end
     end
 end
+
+endmodule
