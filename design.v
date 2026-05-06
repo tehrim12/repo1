@@ -17,21 +17,36 @@ reg [1:0] cnt9, cnt10;
 reg [M-1:0] temp9, temp10;
 reg signed [N-1:0] res_n;
 
-always @(*) begin
-    OPA_1 = 0;
-    OPB_1 = 0;
-    case (inp_valid)
-        2'b01: OPA_1 = OPA;
-        2'b10: OPB_1 = OPB;
-        2'b11: begin
-            OPA_1 = OPA;
-            OPB_1 = OPB;
-        end
-        default: begin
-            OPA_1 = 0;
-            OPB_1 = 0;
-        end
-    endcase
+always @(posedge CLK or posedge RST)
+begin
+    if(RST) begin
+        OPA_1 <= 0;
+        OPB_1 <= 0;
+    end
+
+    else if(CE) begin
+        case(inp_valid)
+
+            2'b01: begin
+                OPA_1 <= OPA;
+            end
+
+            2'b10: begin
+                OPB_1 <= OPB;
+            end
+
+            2'b11: begin
+                OPA_1 <= OPA;
+                OPB_1 <= OPB;
+            end
+
+            default: begin
+                OPA_1 <= OPA_1;
+                OPB_1 <= OPB_1;
+            end
+
+        endcase
+    end
 end
 
 always @(posedge CLK or posedge RST)
@@ -241,5 +256,3 @@ end
         end
     end
 end
-
-endmodule
