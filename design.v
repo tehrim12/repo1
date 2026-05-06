@@ -138,47 +138,44 @@ begin
                 else ERR <= 1;
 
     
-    4'b1001:
-    if(inp_valid==2'b11 ) begin
-        case(cnt9)
-
-            2'd0: begin
-                temp9 <= (OPA_1+1)*(OPB_1+1);
-                RES   <= {M{1'bx}};
-                cnt9  <= 1;
-            end
-
-            2'd1: begin
-                RES   <= temp9;
-                cnt9  <= 0;
-            end
-
-            default: cnt9 <= 0;
-
-        endcase
+   4'b1001:
+begin
+    if(cnt9 == 2'd1)
+    begin
+        RES  <= temp9;
+        cnt9 <= 2'd0;
     end
-    else ERR <= 1;
 
-          4'b1010:
-    if(inp_valid==2'b11 ) begin
-        case(cnt10)
-
-            2'd0: begin
-                temp10 <= (OPA_1<<1)*OPB_1;
-                RES    <= {M{1'bx}};
-                cnt10  <= 1;
-            end
-
-            2'd1: begin
-                RES    <= temp10;
-                cnt10  <= 0;
-            end
-
-            default: cnt10 <= 0;
-
-        endcase
+    else if(inp_valid == 2'b11)
+    begin
+        temp9 <= (OPA_1 + 1) * (OPB_1 + 1);
+        RES   <= {M{1'bx}};
+        cnt9  <= 2'd1;
     end
-    else ERR <= 1;
+
+    else
+        ERR <= 1;
+end
+
+
+4'b1010:
+begin
+    if(cnt10 == 2'd1)
+    begin
+        RES   <= temp10;
+        cnt10 <= 2'd0;
+    end
+
+    else if(inp_valid == 2'b11)
+    begin
+        temp10 <= (OPA_1 << 1) * OPB_1;
+        RES    <= {M{1'bx}};
+        cnt10  <= 2'd1;
+    end
+
+    else
+        ERR <= 1;
+end
 
             4'b1011:
                 if(inp_valid==2'b11) begin
