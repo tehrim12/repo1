@@ -170,7 +170,7 @@ begin
                     ERR <= 0;
                     if (OPB_1[N-1:3] != 0) begin
                         ERR <= 1;
-                        RES <= {1'b1, OPA_1};
+                        RES <= {1'b0, OPA_1};
                     end
                     else begin
                         if (OPB_1[2:0] == 0)
