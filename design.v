@@ -1,26 +1,4 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 05.05.2026 00:20:26
-// Design Name: 
-// Module Name: alu
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-module Eight_bit_ALU_rtl_design
-#(parameter N=4, parameter M=8)
-(OPA,OPB,CIN,CLK,RST,CMD,inp_valid,CE,MODE,COUT,OFLOW,RES,G,E,L,ERR);
+module Eight_bit_ALU_rtl_design#(parameter N=4, parameter M=8)(OPA,OPB,CIN,CLK,RST,CMD,inp_valid,CE,MODE,COUT,OFLOW,RES,G,E,L,ERR);
 
 input signed [N-1:0] OPA, OPB;
 input CLK, RST, CE, MODE, CIN;
