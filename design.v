@@ -252,34 +252,34 @@ end
     if(inp_valid==2'b10)
         RES <= {1'b0, (OPB_1 << 1)};
     else ERR <= 1;
-    4'b1100:
-    if(inp_valid==2'b11) begin
-        if (OPB_1[N-1:3] != 0) begin
-            ERR <= 1;
-            RES <= {1'b0, OPA_1};
-        end
-        else begin
-            if (OPB_1[2:0] == 0)
-                RES <= {1'b0, OPA_1};
-            else
-                RES <= {1'b0, (({OPA_1,OPA_1} << OPB_1[2:0]) >> N)};
-        end
+   4'b1100:
+if(inp_valid==2'b11) begin
+    if(OPB_1[N-1:$clog2(N)] != 0) begin
+        ERR <= 1;
+        RES <= {1'b0, OPA_1};
     end
-    else ERR <= 1;
+    else begin
+        if(OPB_1[$clog2(N)-1:0] == 0)
+            RES <= {1'b0, OPA_1};
+        else
+            RES <= {1'b0, (({OPA_1,OPA_1} << OPB_1[$clog2(N)-1:0]) >> N)};
+    end
+end
+else ERR <= 1;
     4'b1101:
-    if(inp_valid==2'b11) begin
-        if (OPB_1[N-1:3] != 0) begin
-            ERR <= 1;
-            RES <= {1'b0, OPA_1};
-        end
-        else begin
-            if (OPB_1[2:0] == 0)
-                RES <= {1'b0, OPA_1};
-            else
-                RES <= {1'b0, (({OPA_1,OPA_1} >> OPB_1[2:0]) >> N)};
-        end
+if(inp_valid==2'b11) begin
+    if(OPB_1[N-1:$clog2(N)] != 0) begin
+        ERR <= 1;
+        RES <= {1'b0, OPA_1};
     end
-    else ERR <= 1;
+    else begin
+        if(OPB_1[$clog2(N)-1:0] == 0)
+            RES <= {1'b0, OPA_1};
+        else
+            RES <= {1'b0, (({OPA_1,OPA_1} >> OPB_1[$clog2(N)-1:0]) & ((1<<N)-1))};
+    end
+end
+else ERR <= 1;
     default: begin
     ERR <= 1;
     RES <= 0;
